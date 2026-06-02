@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WICKED GENERAL — Clothing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #080808;
+    --white: #f0ece4;
+    --red: #c8392b;
+    --red-dark: #9b2c1f;
+    --gray: #1a1a1a;
+    --gray-mid: #2e2e2e;
+    --gray-light: #555;
+    --text-muted: #888;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+    mix-blend-mode: normal;
+  }
+  .cursor.hovering {
+    width: 40px; height: 40px;
+    background: transparent;
+    border: 1px solid var(--red);
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    mix-blend-mode: normal;
+  }
+  nav::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+    z-index: -1;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--red);
+    padding: 10px 24px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--red-dark); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 120px 60px 80px 60px;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 10vw, 140px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+  .hero-title .accent { color: var(--red); display: block; }
+  .hero-sub {
+    margin-top: 32px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    max-width: 340px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+  .hero-actions {
+    margin-top: 48px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+  .btn-primary {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--red);
+    padding: 16px 40px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--red-dark); transform: translateY(-2px); }
+  .btn-ghost {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gray-mid);
+    padding-bottom: 4px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--white); border-color: var(--white); }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-img-container {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 0.3s forwards;
+  }
+  .hero-img-bg {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 50%, #1f0a07 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  /* Abstract clothing shape */
+  .hero-graphic {
+    width: 70%;
+    max-width: 380px;
+    aspect-ratio: 3/4;
+    position: relative;
+  }
+  .hero-graphic-inner {
+    width: 100%; height: 100%;
+    background: linear-gradient(160deg, #2a2a2a 0%, #181818 60%, #1a0800 100%);
+    clip-path: polygon(20% 0%, 80% 0%, 100% 8%, 100% 100%, 0% 100%, 0% 8%);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(200, 57, 43, 0.15), inset 0 0 60px rgba(0,0,0,0.5);
+  }
+  .hero-graphic-inner::before {
+    content: 'WG';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 180px;
+    color: rgba(200,57,43,0.08);
+    bottom: -20px;
+    right: -20px;
+    letter-spacing: -5px;
+  }
+  .hero-graphic-label {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .hero-stripe {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--red);
+    opacity: 0.3;
+  }
+  .hero-number {
+    position: absolute;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 200px;
+    color: rgba(255,255,255,0.02);
+    line-height: 1;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.2s forwards;
+  }
+  .hero-scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--red);
+    animation: expandLine 1.5s ease 1.5s both;
+  }
+  .hero-scroll-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    background: var(--red);
+    padding: 16px 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 20s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 4px;
+    color: var(--white);
+    padding: 0 40px;
+    white-space: nowrap;
+    opacity: 0.9;
+  }
+  .marquee-dot {
+    color: rgba(255,255,255,0.4);
+    margin: 0 -20px;
+  }
+
+  /* COLLECTIONS */
+  .collections {
+    padding: 120px 60px;
+  }
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 60px;
+  }
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 80px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+  }
+  .section-link {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gray-mid);
+    padding-bottom: 4px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .section-link:hover { color: var(--white); border-color: var(--white); }
+
+  .collections-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 3px;
+  }
+  .col-card {
+    position: relative;
+    overflow: hidden;
+    background: var(--gray);
+    cursor: none;
+  }
+  .col-card:first-child {
+    grid-row: 1 / 3;
+  }
+  .col-card-inner {
+    aspect-ratio: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .col-card:first-child .col-card-inner {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 600px;
+  }
+  .col-bg {
+    width: 100%; height: 100%;
+    position: absolute;
+    inset: 0;
+    transition: transform 0.6s ease;
+  }
+  .col-card:hover .col-bg { transform: scale(1.05); }
+
+  .col-bg-1 { background: linear-gradient(145deg, #1c1c1c 0%, #111 40%, #200c07 100%); }
+  .col-bg-2 { background: linear-gradient(145deg, #141414 0%, #1a1a1a 100%); }
+  .col-bg-3 { background: linear-gradient(145deg, #181818 0%, #0f0f0f 100%); }
+  .col-bg-4 { background: linear-gradient(145deg, #111 0%, #1c1000 100%); }
+  .col-bg-5 { background: linear-gradient(145deg, #161616 0%, #111 100%); }
+
+  .col-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .col-icon {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: rgba(255,255,255,0.05);
+    letter-spacing: 2px;
+  }
+  .col-card:first-child .col-icon { font-size: 140px; }
+
+  .col-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 24px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+  .col-card:hover .col-info { transform: translateY(0); opacity: 1; }
+  .col-card:first-child .col-info { transform: translateY(0); opacity: 1; }
+
+  .col-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .col-card:first-child .col-name { font-size: 40px; }
+  .col-pieces {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .col-tag {
+    display: inline-block;
+    margin-top: 12px;
+    background: var(--red);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    color: var(--white);
+  }
+
+  /* FEATURED PRODUCTS */
+  .products {
+    padding: 0 60px 120px;
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    margin-top: 60px;
+  }
+  .product-card {
+    position: relative;
+    overflow: hidden;
+    background: var(--gray);
+    cursor: none;
+  }
+  .product-img {
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+  }
+  .product-bg {
+    width: 100%; height: 100%;
+    position: absolute;
+    inset: 0;
+    transition: transform 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .product-card:hover .product-bg { transform: scale(1.04); }
+
+  .prod-bg-1 { background: linear-gradient(160deg, #1a1a1a, #111, #1a0800); }
+  .prod-bg-2 { background: linear-gradient(160deg, #141414, #0d0d0d, #1a0500); }
+  .prod-bg-3 { background: linear-gradient(160deg, #181818, #111, #000); }
+  .prod-bg-4 { background: linear-gradient(160deg, #121212, #0f0f0f, #110a00); }
+
+  .prod-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 60px;
+    color: rgba(255,255,255,0.04);
+    letter-spacing: 2px;
+  }
+
+  .product-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .product-card:hover .product-overlay { opacity: 1; }
+  .product-quick {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--red);
+    padding: 12px 28px;
+    border: none;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .product-quick:hover { background: var(--red-dark); }
+
+  .product-info {
+    padding: 16px;
+    background: var(--gray);
+    border-top: 1px solid var(--gray-mid);
+  }
+  .product-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .product-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    color: var(--red);
+  }
+  .product-sizes {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .product-badge {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: var(--red);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    color: var(--white);
+    z-index: 2;
+  }
+
+  /* MANIFESTO */
+  .manifesto {
+    padding: 160px 60px;
+    position: relative;
+    overflow: hidden;
+    background: var(--gray);
+  }
+  .manifesto::before {
+    content: 'WICKED';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(120px, 18vw, 280px);
+    color: rgba(255,255,255,0.025);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 10px;
+  }
+  .manifesto-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .manifesto-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 40px;
+  }
+  .manifesto-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.1;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 40px;
+  }
+  .manifesto-text em { color: var(--red); font-style: normal; }
+  .manifesto-body {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--text-muted);
+    max-width: 500px;
+    margin: 0 auto 48px;
+  }
+  .manifesto-divider {
+    width: 40px;
+    height: 2px;
+    background: var(--red);
+    margin: 0 auto 40px;
+  }
+
+  /* STATS */
+  .stats {
+    padding: 80px 60px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+  }
+  .stat-box {
+    background: var(--gray);
+    padding: 50px 40px;
+    text-align: center;
+    border-top: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .stat-box:hover { border-color: var(--red); }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--white);
+    line-height: 1;
+    letter-spacing: 2px;
+  }
+  .stat-num span { color: var(--red); }
+  .stat-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  /* CTA BANNER */
+  .cta-banner {
+    margin: 0 60px 120px;
+    background: var(--red);
+    padding: 80px 60px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-banner::before {
+    content: 'NEW DROP';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 200px;
+    color: rgba(0,0,0,0.1);
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    letter-spacing: 5px;
+  }
+  .cta-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 16px;
+  }
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 5vw, 72px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    color: var(--white);
+  }
+  .btn-white {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    background: var(--white);
+    padding: 18px 48px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    z-index: 2;
+  }
+  .btn-white:hover { background: var(--black); color: var(--white); }
+
+  /* NEWSLETTER */
+  .newsletter {
+    padding: 80px 60px 120px;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .newsletter .section-label { text-align: center; margin-bottom: 20px; }
+  .newsletter-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .newsletter-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+  .newsletter-form {
+    display: flex;
+    gap: 0;
+  }
+  .newsletter-input {
+    flex: 1;
+    background: var(--gray);
+    border: 1px solid var(--gray-mid);
+    border-right: none;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 16px 20px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .newsletter-input::placeholder { color: var(--gray-light); }
+  .newsletter-input:focus { border-color: var(--red); }
+  .newsletter-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 16px 32px;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .newsletter-btn:hover { background: var(--red-dark); }
+
+  /* FOOTER */
+  footer {
+    background: var(--gray);
+    padding: 60px;
+    border-top: 1px solid var(--gray-mid);
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 60px;
+  }
+  .footer-brand-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 4px;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .footer-brand-name span { color: var(--red); }
+  .footer-desc {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    max-width: 280px;
+  }
+  .footer-socials {
+    display: flex;
+    gap: 16px;
+  }
+  .social-btn {
+    width: 38px; height: 38px;
+    border: 1px solid var(--gray-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .social-btn:hover { border-color: var(--red); color: var(--white); background: var(--red); }
+
+  .footer-col-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 24px;
+  }
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .footer-links a {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--white); }
+
+  .footer-bottom {
+    border-top: 1px solid var(--gray-mid);
+    padding-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-copy {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gray-light);
+    text-transform: uppercase;
+  }
+  .footer-copy span { color: var(--red); }
+  .footer-legal {
+    display: flex;
+    gap: 32px;
+  }
+  .footer-legal a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-legal a:hover { color: var(--white); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes expandLine {
+    from { width: 0; }
+    to { width: 40px; }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links, .nav-cta { display: none; }
+
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 100px 24px 60px; }
+    .hero-right { height: 320px; }
+    .hero-scroll { left: 24px; }
+    .hero-number { font-size: 120px; }
+
+    .collections { padding: 80px 24px; }
+    .collections-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .col-card:first-child { grid-row: auto; }
+    .col-card:first-child .col-card-inner { min-height: 400px; }
+    .col-card .col-card-inner { aspect-ratio: 4/3; }
+    .col-info { transform: translateY(0); opacity: 1; }
+
+    .products { padding: 0 24px 80px; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .manifesto { padding: 80px 24px; }
+
+    .stats { grid-template-columns: repeat(2, 1fr); padding: 40px 24px; }
+    .stat-box { padding: 32px 20px; }
+    .stat-num { font-size: 52px; }
+
+    .cta-banner { margin: 0 24px 80px; padding: 48px 32px; grid-template-columns: 1fr; }
+    .cta-banner::before { font-size: 80px; }
+
+    .newsletter { padding: 60px 24px; }
+    .newsletter-form { flex-direction: column; }
+    .newsletter-input { border-right: 1px solid var(--gray-mid); border-bottom: none; }
+
+    footer { padding: 40px 24px; }
+    .footer-top { grid-template-columns: 1fr; gap: 40px; }
+    .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
+
+    body { cursor: auto; }
+    .cursor { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">WICKED <span>GENERAL</span></a>
+  <ul class="nav-links">
+    <li><a href="#collections">Collections</a></li>
+    <li><a href="#products">Shop</a></li>
+    <li><a href="#manifesto">About</a></li>
+    <li><a href="#">Lookbook</a></li>
+  </ul>
+  <a href="#products" class="nav-cta">Shop Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-tag">New Drop — SS 2026 Collection</p>
+    <h1 class="hero-title">
+      Wear The<br>
+      <span class="accent">Streets.</span>
+    </h1>
+    <p class="hero-sub">Wicked General is built for those who move different. Raw cuts, bold statements, zero compromise.</p>
+    <div class="hero-actions">
+      <a href="#products" class="btn-primary">Shop Collection</a>
+      <a href="#manifesto" class="btn-ghost">Our Story</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-container">
+      <div class="hero-img-bg">
+        <div class="hero-graphic">
+          <div class="hero-graphic-inner">
+            <div class="hero-stripe"></div>
+          </div>
+          <p class="hero-graphic-label">SS 2026 Lookbook</p>
+        </div>
+      </div>
+    </div>
+    <div class="hero-number">26</div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span class="hero-scroll-text">Scroll to explore</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">WICKED GENERAL</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">STREETWEAR UNISEX</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">NEW DROP 2026</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">WEAR THE STREETS</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">LIMITED EDITION</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">WICKED GENERAL</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">STREETWEAR UNISEX</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">NEW DROP 2026</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">WEAR THE STREETS</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">LIMITED EDITION</span>
+    <span class="marquee-item marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- COLLECTIONS -->
+<section class="collections" id="collections">
+  <div class="section-header">
+    <div>
+      <p class="section-label">Browse</p>
+      <h2 class="section-title">Collections</h2>
+    </div>
+    <a href="#" class="section-link">View All</a>
+  </div>
+  <div class="collections-grid reveal">
+    <div class="col-card">
+      <div class="col-card-inner">
+        <div class="col-bg col-bg-1">
+          <div class="col-placeholder">
+            <div class="col-icon">WG</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-info">
+        <p class="col-name">CORE ESSENTIALS</p>
+        <p class="col-pieces">24 pieces</p>
+        <span class="col-tag">Best Seller</span>
+      </div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-inner">
+        <div class="col-bg col-bg-2">
+          <div class="col-placeholder">
+            <div class="col-icon">SS</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-info">
+        <p class="col-name">STREET SERIES</p>
+        <p class="col-pieces">18 pieces</p>
+      </div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-inner">
+        <div class="col-bg col-bg-3">
+          <div class="col-placeholder">
+            <div class="col-icon">HD</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-info">
+        <p class="col-name">HEAVY DUTY</p>
+        <p class="col-pieces">12 pieces</p>
+      </div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-inner">
+        <div class="col-bg col-bg-4">
+          <div class="col-placeholder">
+            <div class="col-icon">AC</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-info">
+        <p class="col-name">ACCESSORIES</p>
+        <p class="col-pieces">30 pieces</p>
+      </div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-inner">
+        <div class="col-bg col-bg-5">
+          <div class="col-placeholder">
+            <div class="col-icon">LTD</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-info">
+        <p class="col-name">LIMITED DROPS</p>
+        <p class="col-pieces">6 pieces</p>
+        <span class="col-tag">Exclusive</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products" id="products">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">Featured</p>
+      <h2 class="section-title">New Arrivals</h2>
+    </div>
+    <a href="#" class="section-link">View All</a>
+  </div>
+  <div class="products-grid reveal">
+
+    <div class="product-card">
+      <div class="product-badge">New</div>
+      <div class="product-img">
+        <div class="product-bg prod-bg-1">
+          <span class="prod-label">TEE</span>
+        </div>
+        <div class="product-overlay">
+          <button class="product-quick">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <p class="product-name">WG LOGO OVERSIZED TEE</p>
+        <div class="product-meta">
+          <span class="product-price">₦18,500</span>
+          <span class="product-sizes">XS–3XL</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-badge">Limited</div>
+      <div class="product-img">
+        <div class="product-bg prod-bg-2">
+          <span class="prod-label">HOOD</span>
+        </div>
+        <div class="product-overlay">
+          <button class="product-quick">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <p class="product-name">TACTICAL HEAVYWEIGHT HOODIE</p>
+        <div class="product-meta">
+          <span class="product-price">₦34,000</span>
+          <span class="product-sizes">S–2XL</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        <div class="product-bg prod-bg-3">
+          <span class="prod-label">CARGO</span>
+        </div>
+        <div class="product-overlay">
+          <button class="product-quick">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <p class="product-name">URBAN CARGO PANTS</p>
+        <div class="product-meta">
+          <span class="product-price">₦27,000</span>
+          <span class="product-sizes">28–38</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-badge">Drop</div>
+      <div class="product-img">
+        <div class="product-bg prod-bg-4">
+          <span class="prod-label">JKT</span>
+        </div>
+        <div class="product-overlay">
+          <button class="product-quick">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <p class="product-name">GENERAL BOMBER JACKET</p>
+        <div class="product-meta">
+          <span class="product-price">₦52,000</span>
+          <span class="product-sizes">S–XL</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="manifesto">
+  <div class="manifesto-inner reveal">
+    <p class="manifesto-label">Who We Are</p>
+    <div class="manifesto-divider"></div>
+    <h2 class="manifesto-text">
+      Built for the <em>Bold.</em><br>Made for the Streets.
+    </h2>
+    <p class="manifesto-body">
+      Wicked General was born from the streets — not boardrooms. Every cut, every stitch, every drop is designed for people who don't wait for permission to stand out. We make clothing for the generals.
+    </p>
+    <a href="#" class="btn-primary">Read Our Story</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats reveal">
+  <div class="stat-box">
+    <div class="stat-num">5<span>K+</span></div>
+    <p class="stat-label">Units Sold</p>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">67<span>+</span></div>
+    <p class="stat-label">Pieces Released</p>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">12<span></span></div>
+    <p class="stat-label">Collections</p>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">100<span>%</span></div>
+    <p class="stat-label">Street Approved</p>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner reveal">
+  <div>
+    <p class="cta-label">Don't Miss Out</p>
+    <h2 class="cta-title">New Drop<br>Every Month.</h2>
+  </div>
+  <a href="#newsletter" class="btn-white">Get Early Access</a>
+</div>
+
+<!-- NEWSLETTER -->
+<section class="newsletter" id="newsletter">
+  <div class="reveal">
+    <p class="section-label">Stay Connected</p>
+    <h2 class="newsletter-title">JOIN THE GENERALS</h2>
+    <p class="newsletter-sub">Be first to know about new drops, exclusive collabs, and limited editions. No spam — just heat.</p>
+    <div class="newsletter-form">
+      <input type="email" class="newsletter-input" placeholder="your@email.com">
+      <button class="newsletter-btn">Subscribe</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <p class="footer-brand-name">WICKED <span>GENERAL</span></p>
+      <p class="footer-desc">Streetwear for those who move different. Unisex cuts, bold designs, zero compromise. Made for the streets.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-btn">IG</a>
+        <a href="#" class="social-btn">TK</a>
+        <a href="#" class="social-btn">TW</a>
+        <a href="#" class="social-btn">FB</a>
+      </div>
+    </div>
+    <div>
+      <p class="footer-col-title">Shop</p>
+      <ul class="footer-links">
+        <li><a href="#">New Arrivals</a></li>
+        <li><a href="#">Core Essentials</a></li>
+        <li><a href="#">Street Series</a></li>
+        <li><a href="#">Heavy Duty</a></li>
+        <li><a href="#">Accessories</a></li>
+        <li><a href="#">Limited Drops</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Help</p>
+      <ul class="footer-links">
+        <li><a href="#">Size Guide</a></li>
+        <li><a href="#">Shipping Info</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Track Order</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Brand</p>
+      <ul class="footer-links">
+        <li><a href="#">Our Story</a></li>
+        <li><a href="#">Lookbook</a></li>
+        <li><a href="#">Collabs</a></li>
+        <li><a href="#">Stockists</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 <span>Wicked General</span> Clothing. All rights reserved.</p>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, .col-card, .product-card, .stat-box').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      nav.style.background = 'rgba(8,8,8,0.98)';
+      nav.style.backdropFilter = 'blur(10px)';
+    } else {
+      nav.style.background = '';
+      nav.style.backdropFilter = '';
+    }
+  });
+
+  // Newsletter
+  document.querySelector('.newsletter-btn').addEventListener('click', function() {
+    const input = document.querySelector('.newsletter-input');
+    if (input.value.includes('@')) {
+      this.textContent = 'Subscribed ✓';
+      this.style.background = '#1a7a3a';
+      input.value = '';
+    }
+  });
+</script>
+</body>
+</html>
+
